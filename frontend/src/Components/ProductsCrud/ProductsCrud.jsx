@@ -90,6 +90,25 @@ const ProductsCrud = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Button
+        variant="outlined"
+        sx={{
+          marginTop: 3,
+          display: "block",
+          marginLeft: "auto",
+          marginRight: "auto",
+          color: "#F54749",
+          borderColor: "#F54749",
+          "&:hover": {
+            backgroundColor: "#F54749",
+            color: "#fff",
+            borderColor: "#F54749",
+          },
+        }}
+        onClick={() => navigate("/")}
+      >
+        Voltar ao Menu
+      </Button>
     </Box>
   );
 };
