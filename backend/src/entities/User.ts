@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Order } from "./Order";
 
-@Entity()
+@Entity("users") 
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -19,5 +19,5 @@ export class User {
   isActive!: boolean;
 
   @OneToMany(() => Order, (order) => order.user)
-  orders!: Order[]; 
+  orders!: Order[];
 }
