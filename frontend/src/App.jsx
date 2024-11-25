@@ -1,19 +1,27 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import UserCrud from "./presentation/pages/UserCRUD.jsx";
-import AddUser from "./presentation/pages/AddUser.jsx";
-import EditUser from "./presentation/pages/EditUser.jsx";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import CategoriesCrud from "./presentation/pages/CategoriesCrud.jsx";
+import AddCategory from "./presentation/pages/AddCategory.jsx";
+import EditCategory from "./presentation/pages/EditCategory.jsx";
 
-function App() {
+const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<UserCrud />} />
-        <Route path="/add-user" element={<AddUser />} />
-        <Route path="/edit-user/:id" element={<EditUser />} /> {/* Rota para edição */}
+        {/* Redireciona a rota raiz para /categories */}
+        <Route path="/" element={<Navigate to="/categories" />} />
+
+        {/* Página principal de gerenciamento de categorias */}
+        <Route path="/categories" element={<CategoriesCrud />} />
+
+        {/* Página para adicionar uma nova categoria */}
+        <Route path="/add-category" element={<AddCategory />} />
+
+        {/* Página para editar uma categoria existente */}
+        <Route path="/edit-category/:id" element={<EditCategory />} />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;
