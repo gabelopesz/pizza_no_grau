@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, JoinTable } from "typeorm";
 import { Category } from "./Category";
+import { Order } from "./Order";
 
-@Entity("products") 
+@Entity("products")
 export class Product {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -15,8 +16,12 @@ export class Product {
   @Column()
   description!: string;
 
-  @ManyToOne(() => Category, (category) => category.products, { nullable: true })
-  category!: Category | null;
+  @ManyToOne(() => Category, (category) => category.products, { nullable: false })
+  category!: Category;
+
+  @ManyToMany(() => Order, (order) => order.products)
+  @JoinTable()
+  orders!: Order[];
 
   @Column({ default: true })
   isActive!: boolean;
