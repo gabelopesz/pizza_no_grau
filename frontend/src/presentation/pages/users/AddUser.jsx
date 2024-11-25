@@ -32,8 +32,22 @@ const AddUser = () => {
         Adicionar Usuário
       </Typography>
       <form onSubmit={handleSubmit}>
-        <TextField fullWidth label="Nome" name="name" value={formData.name} onChange={handleChange} />
-        <TextField fullWidth label="E-mail" name="email" value={formData.email} onChange={handleChange} />
+        <TextField
+          fullWidth
+          label="Nome"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          sx={{ marginBottom: 2 }} // Aumenta o espaço entre os campos
+        />
+        <TextField
+          fullWidth
+          label="E-mail"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          sx={{ marginBottom: 2 }} // Aumenta o espaço entre os campos
+        />
         <TextField
           fullWidth
           label="Senha"
@@ -41,6 +55,7 @@ const AddUser = () => {
           type="password"
           value={formData.password}
           onChange={handleChange}
+          sx={{ marginBottom: 2 }} // Aumenta o espaço entre os campos
         />
         <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 2 }}>
           Salvar

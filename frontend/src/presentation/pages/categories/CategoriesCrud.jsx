@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { listCategories } from "../../../application/useCases/category/listCategories.js";
 import { deleteCategory } from "../../../application/useCases/category/deleteCategory.js";
 
+
 const CategoriesCrud = () => {
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
