@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:delivery_app/pages/login_page.dart';
+import 'pages/initial_page.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: LoginPage(),
+      debugShowCheckedModeBanner: false,
+      title: 'Pizza no Grau',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
+      home: InitialPage(),
     );
   }
 }
