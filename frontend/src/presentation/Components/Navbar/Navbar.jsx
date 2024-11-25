@@ -14,7 +14,7 @@ const Navbar = () => {
             <Button
               color="inherit"
               component={Link}
-              to="/product"
+              to="/products"
               sx={{
                 color: '#FFFFFF', // Texto branco
                 '&:hover': {
