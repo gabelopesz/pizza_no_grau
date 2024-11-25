@@ -2,8 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { AppDataSource } from "./config/database";
-import { productRoutes } from "./routes/productRoutes";
 import { userRoutes } from "./routes/userRoutes";
+import { productRoutes } from "./routes/productRoutes";
+import { orderRoutes } from "./routes/orderRoutes";
 
 dotenv.config();
 
@@ -16,9 +17,10 @@ AppDataSource.initialize()
   .then(() => {
     console.log("Banco de dados conectado!");
 
-    // Registrar as rotas
-    app.use("/products", productRoutes);
+    // Registrar rotas
     app.use("/users", userRoutes);
+    app.use("/products", productRoutes);
+    app.use("/orders", orderRoutes);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
