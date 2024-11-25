@@ -7,11 +7,12 @@ interface ProductInput {
   price: number;
   description: string;
   categoryId?: number; // Categoria opcional
+  imageUrl?: string; // Caminho para a imagem opcional
 }
 
 export class CreateProductUseCase {
   async execute(data: ProductInput): Promise<Product> {
-    const { name, price, description, categoryId } = data;
+    const { name, price, description, categoryId, imageUrl } = data;
 
     // Verifica se a categoria existe (caso fornecida)
     let category: Category | null = null;
@@ -28,7 +29,8 @@ export class CreateProductUseCase {
       price,
       description,
       isActive: true,
-      category: category || undefined, // Converte null para undefined
+      category: category || undefined, 
+      imageUrl, 
     });
 
     return await ProductRepository.save(product);

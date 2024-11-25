@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { ProductController } from "../controllers/ProductController";
+import { upload } from "../middleware/uploadMiddleware"; // Middleware para upload de imagens
 
 const productRoutes = Router();
 const productController = new ProductController();
 
-// Criar produto
-productRoutes.post("/", async (req, res, next) => {
+// Criar produto com imagem
+productRoutes.post("/", upload.single("image"), async (req, res, next) => {
   try {
+    req.body.imageUrl = req.file?.path; // Adiciona o caminho da imagem ao corpo da requisição
     await productController.create(req, res);
   } catch (error) {
     next(error);
@@ -22,9 +24,10 @@ productRoutes.get("/", async (req, res, next) => {
   }
 });
 
-// Editar produto
-productRoutes.put("/:id", async (req, res, next) => {
+// Editar produto (incluindo imagem, se enviada)
+productRoutes.put("/:id", upload.single("image"), async (req, res, next) => {
   try {
+    req.body.imageUrl = req.file?.path; // Adiciona o caminho da imagem ao corpo da requisição
     await productController.edit(req, res);
   } catch (error) {
     next(error);

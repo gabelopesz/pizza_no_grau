@@ -25,4 +25,7 @@ export class Product {
 
   @Column({ default: true })
   isActive!: boolean;
+
+  @Column({ nullable: true })
+  imageUrl!: string;
 }
