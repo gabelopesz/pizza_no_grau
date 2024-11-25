@@ -5,6 +5,7 @@ import { AppDataSource } from "./config/database";
 import { userRoutes } from "./routes/userRoutes";
 import { productRoutes } from "./routes/productRoutes";
 import { orderRoutes } from "./routes/orderRoutes";
+import { categoryRoutes } from "./routes/categoryRoutes";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ AppDataSource.initialize()
     console.log("Banco de dados conectado!");
 
     // Registrar rotas
+    app.use("/categories", categoryRoutes);
     app.use("/users", userRoutes);
     app.use("/products", productRoutes);
     app.use("/orders", orderRoutes);
