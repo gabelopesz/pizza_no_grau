@@ -55,7 +55,7 @@ const ProductCRUD = () => {
   };
 
   const handleEditProduct = (product) => {
-    navigate(`/edit-product/${product.id}`, { state: { product } }); // Passa o produto para a tela de edição
+    navigate(`/edit-product/${product.id}`, { state: { product } }); 
   };
 
   return (
