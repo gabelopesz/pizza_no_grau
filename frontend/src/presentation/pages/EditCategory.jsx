@@ -1,43 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { editCategory } from "../../application/useCases/category/editCategory.js";
-import { getCategory } from "../../application/useCases/category/getCategory.js";
 import { Box, Button, TextField, Typography, Paper } from "@mui/material";
 
 const EditCategory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: "" });
+  const [name, setName] = useState("");
 
   useEffect(() => {
-    // Buscar os detalhes da categoria pelo ID
+    // Simular busca de categoria por ID
     const fetchCategory = async () => {
-      try {
-        const category = await getCategory(id); // Use case para buscar a categoria
-        setFormData({ name: category.name });
-      } catch (error) {
-        console.error("Erro ao buscar categoria:", error);
-        alert("Erro ao carregar os dados da categoria.");
-        navigate("/categories"); // Redirecionar em caso de erro
-      }
+      // Substituir pela lógica real de busca no backend
+      setName("Categoria");
     };
     fetchCategory();
-  }, [id, navigate]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await editCategory(id, formData);
+      await editCategory(id, { name });
       alert("Categoria atualizada com sucesso!");
       navigate("/categories");
     } catch (error) {
-      console.error("Erro ao editar categoria:", error);
-      alert("Erro ao editar categoria.");
+      console.error("Erro ao atualizar categoria:", error);
+      alert("Erro ao atualizar categoria.");
     }
   };
 
@@ -50,9 +38,8 @@ const EditCategory = () => {
         <TextField
           fullWidth
           label="Nome"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           margin="normal"
         />
         <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 2 }}>

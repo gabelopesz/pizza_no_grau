@@ -8,16 +8,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Redireciona a rota raiz para /categories */}
         <Route path="/" element={<Navigate to="/categories" />} />
-
-        {/* Página principal de gerenciamento de categorias */}
         <Route path="/categories" element={<CategoriesCrud />} />
-
-        {/* Página para adicionar uma nova categoria */}
-        <Route path="/add-category" element={<AddCategory />} />
-
-        {/* Página para editar uma categoria existente */}
+        <Route path="/add-categories" element={<AddCategory />} />
         <Route path="/edit-category/:id" element={<EditCategory />} />
       </Routes>
     </Router>

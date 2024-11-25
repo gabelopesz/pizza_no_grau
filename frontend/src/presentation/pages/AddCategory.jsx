@@ -4,18 +4,19 @@ import { addCategory } from "../../application/useCases/category/addCategory.js"
 import { Box, Button, TextField, Typography, Paper } from "@mui/material";
 
 const AddCategory = () => {
-  const [formData, setFormData] = useState({ name: ""});
+  const [name, setName] = useState(""); // Campo para o nome da categoria
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!name.trim()) {
+      alert("O campo 'Nome' é obrigatório.");
+      return;
+    }
+
     try {
-      await addCategory(formData);
+      await addCategory({ name });
       alert("Categoria adicionada com sucesso!");
       navigate("/categories");
     } catch (error) {
@@ -33,12 +34,10 @@ const AddCategory = () => {
         <TextField
           fullWidth
           label="Nome"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           margin="normal"
         />
- 
         <Button type="submit" variant="contained" fullWidth sx={{ marginTop: 2 }}>
           Salvar
         </Button>
