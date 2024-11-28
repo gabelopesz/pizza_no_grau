@@ -5,11 +5,12 @@ import { EditCategoryUseCase } from "../usecases/Category/EditCategoryUseCase";
 import { DeleteCategoryUseCase } from "../usecases/Category/DeleteCategoryUseCase";
 
 export class CategoryController {
-  private createCategoryUseCase: CreateCategoryUseCase;
-
-  constructor(createCategoryUseCase: CreateCategoryUseCase) {
-    this.createCategoryUseCase = createCategoryUseCase;
-  }
+  constructor(
+    private createCategoryUseCase: CreateCategoryUseCase,
+    private listCategoriesUseCase: ListCategoriesUseCase,
+    private editCategoryUseCase: EditCategoryUseCase,
+    private deleteCategoryUseCase: DeleteCategoryUseCase
+  ) {}
 
   async create(req: Request, res: Response): Promise<Response> {
     try {
@@ -23,8 +24,7 @@ export class CategoryController {
 
   async list(req: Request, res: Response): Promise<Response> {
     try {
-      const listCategories = new ListCategoriesUseCase();
-      const categories = await listCategories.execute();
+      const categories = await this.listCategoriesUseCase.execute();
       return res.status(200).json(categories);
     } catch (error) {
       return res.status(400).json({ error: (error as Error).message });
@@ -35,8 +35,7 @@ export class CategoryController {
     try {
       const { id } = req.params;
       const { name } = req.body;
-      const editCategory = new EditCategoryUseCase();
-      await editCategory.execute({ id: Number(id), name });
+      await this.editCategoryUseCase.execute({ id: Number(id), name });
       return res.status(200).json({ message: "Categoria atualizada com sucesso." });
     } catch (error) {
       return res.status(400).json({ error: (error as Error).message });
@@ -46,8 +45,7 @@ export class CategoryController {
   async delete(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const deleteCategory = new DeleteCategoryUseCase();
-      await deleteCategory.execute(Number(id));
+      await this.deleteCategoryUseCase.execute(Number(id));
       return res.status(200).json({ message: "Categoria excluída com sucesso." });
     } catch (error) {
       return res.status(400).json({ error: (error as Error).message });
