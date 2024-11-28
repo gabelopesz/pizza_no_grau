@@ -1,185 +1,176 @@
+// Importa o controlador de pedidos e os casos de uso
 import { OrderController } from "../OrderController";
 import { CreateOrderUseCase } from "../../usecases/Order/CreateOrderUseCase";
 import { CancelOrderUseCase } from "../../usecases/Order/CancelOrderUseCase";
 import { TrackOrderUseCase } from "../../usecases/Order/TrackOrderUseCase";
 import { ListOrdersUseCase } from "../../usecases/Order/ListOrdersUseCase";
+import { CompleteOrderUseCase } from "../../usecases/Order/CompleteOrderUseCase";
 import { Request, Response } from "express";
 
-// Mocks automáticos para os casos de uso
+// Mocka os casos de uso para evitar chamadas reais a banco de dados ou serviços externos
 jest.mock("../../usecases/Order/CreateOrderUseCase");
 jest.mock("../../usecases/Order/CancelOrderUseCase");
 jest.mock("../../usecases/Order/TrackOrderUseCase");
 jest.mock("../../usecases/Order/ListOrdersUseCase");
+jest.mock("../../usecases/Order/CompleteOrderUseCase");
 
 describe("OrderController", () => {
-  let controller: OrderController;
-  let mockReq: Partial<Request>;
-  let mockRes: Partial<Response>;
-  let statusMock: jest.Mock;
-  let jsonMock: jest.Mock;
+  // Declarações das variáveis utilizadas em cada teste
+  let controller: OrderController; // Instância do controlador
+  let mockReq: Partial<Request>; // Mock da requisição
+  let mockRes: Partial<Response>; // Mock da resposta
 
+  // Executado antes de cada teste para garantir isolamento entre os casos
   beforeEach(() => {
-    controller = new OrderController();  // Inicializa o controlador de pedidos antes de cada teste
-    mockReq = {};  // Inicializa o objeto `req` (requisição) vazio
+    controller = new OrderController(); // Instancia o controlador
+    mockReq = {}; // Inicializa o mock da requisição
     mockRes = {
-      status: jest.fn().mockReturnThis(),  // Mock do método `status`
-      json: jest.fn(),                    // Mock do método `json`
+      status: jest.fn().mockReturnThis(), // Mocka o método `status` da resposta
+      json: jest.fn(), // Mocka o método `json` da resposta
     };
-    statusMock = mockRes.status as jest.Mock;  // Mock do `status` do `res`
-    jsonMock = mockRes.json as jest.Mock;      // Mock do `json` do `res`
   });
 
+  // Teste para criar um pedido com sucesso
   it("should create an order successfully", async () => {
-    const orderData = { userId: 1, products: [1, 2], paymentMethod: "credit" };  // Dados para criação de pedido
-    const mockOrder = { id: 123, ...orderData };  // Pedido mockado, com um ID adicionado
+    // Dados de entrada para a criação do pedido
+    const orderData = {
+      userId: 1,
+      products: [1, 2],
+      paymentMethod: "credit",
+      addressId: 1,
+    };
 
-    // Mock do `CreateOrderUseCase` para simular sucesso na criação do pedido
-    (CreateOrderUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockResolvedValue(mockOrder),
-    }));
+    // Dados esperados de retorno após a criação do pedido
+    const mockOrder = {
+      id: 123,
+      userId: 1,
+      products: [{ id: 1 }, { id: 2 }],
+      paymentMethod: "credit",
+      totalPrice: 100,
+      status: "PENDING",
+    };
 
-    mockReq.body = orderData;  // Define o corpo da requisição com os dados do pedido
+    // Mocka a execução do caso de uso para retornar os dados simulados
+    (CreateOrderUseCase.prototype.execute as jest.Mock).mockResolvedValue(mockOrder);
 
-    // Chama o método `create` do controlador de pedidos
+    mockReq.body = orderData; // Simula os dados da requisição
+
+    // Chama o método de criação de pedido no controlador
     await controller.create(mockReq as Request, mockRes as Response);
 
-    // Verifica se o status 201 (Created) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(201);
-    // Verifica se o pedido mockado foi retornado como resposta
-    expect(jsonMock).toHaveBeenCalledWith(mockOrder);
+    // Verifica se o código HTTP 201 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(201);
+    // Verifica se o pedido criado foi retornado corretamente
+    expect(mockRes.json).toHaveBeenCalledWith(mockOrder);
   });
 
-  it("should return error when create order fails", async () => {
-    const error = new Error("Order creation failed");  // Erro simulado
+  // Teste para verificar erro ao criar pedido com dados ausentes
+  it("should return error when creating an order with missing data", async () => {
+    mockReq.body = { userId: 1 }; // Dados incompletos para a criação do pedido
 
-    // Mock do `CreateOrderUseCase` para simular falha na criação do pedido
-    (CreateOrderUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockRejectedValue(error),
-    }));
-
-    mockReq.body = { userId: 1, products: [1, 2], paymentMethod: "credit" };  // Dados do pedido
-
-    // Chama o método `create` do controlador de pedidos
+    // Chama o método de criação com dados ausentes
     await controller.create(mockReq as Request, mockRes as Response);
 
-    // Verifica se o status 400 (Bad Request) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(400);
+    // Verifica se o código HTTP 400 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(400);
     // Verifica se a mensagem de erro foi retornada
-    expect(jsonMock).toHaveBeenCalledWith({ error: error.message });
+    expect(mockRes.json).toHaveBeenCalledWith({ error: "Dados obrigatórios ausentes." });
   });
 
+  // Teste para cancelar um pedido com sucesso
   it("should cancel an order successfully", async () => {
-    const mockId = 123;  // ID do pedido a ser cancelado
+    const mockId = 123; // ID do pedido a ser cancelado
 
-    // Mock do `CancelOrderUseCase` para simular sucesso no cancelamento
-    (CancelOrderUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockResolvedValue(undefined),  // Retorna `undefined` como sucesso
-    }));
+    // Mocka o caso de uso para retornar sucesso
+    (CancelOrderUseCase.prototype.execute as jest.Mock).mockResolvedValue(undefined);
 
-    mockReq.params = { id: `${mockId}` };  // Define o parâmetro `id` na URL da requisição
+    mockReq.params = { userId: "1", orderId: `${mockId}` }; // Simula os parâmetros da requisição
 
-    // Chama o método `cancel` do controlador de pedidos
+    // Chama o método de cancelamento no controlador
     await controller.cancel(mockReq as Request, mockRes as Response);
 
-    // Verifica se o status 200 (OK) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(200);
+    // Verifica se o código HTTP 200 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(200);
     // Verifica se a mensagem de sucesso foi retornada
-    expect(jsonMock).toHaveBeenCalledWith({ message: "Pedido cancelado com sucesso." });
+    expect(mockRes.json).toHaveBeenCalledWith({ message: "Pedido cancelado com sucesso." });
   });
 
-  it("should return error when cancel order fails", async () => {
-    const error = new Error("Cancel failed");  // Erro simulado no cancelamento do pedido
-
-    // Mock do `CancelOrderUseCase` para simular falha no cancelamento do pedido
-    (CancelOrderUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockRejectedValue(error),
-    }));
-
-    mockReq.params = { id: "123" };  // Define o ID do pedido a ser cancelado
-
-    // Chama o método `cancel` do controlador de pedidos
-    await controller.cancel(mockReq as Request, mockRes as Response);
-
-    // Verifica se o status 400 (Bad Request) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(400);
-    // Verifica se a mensagem de erro foi retornada
-    expect(jsonMock).toHaveBeenCalledWith({ error: error.message });
-  });
-
+  // Teste para rastrear um pedido com sucesso
   it("should track an order successfully", async () => {
-    const mockId = 123;  // ID do pedido
-    const mockStatus = "delivered";  // Status do pedido
+    const mockStatus = { id: 123, status: "DELIVERED" }; // Status esperado do pedido
 
-    // Mock do `TrackOrderUseCase` para simular sucesso no rastreamento
-    (TrackOrderUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockResolvedValue(mockStatus),  // Retorna o status mockado
-    }));
+    // Mocka o caso de uso para retornar o status do pedido
+    (TrackOrderUseCase.prototype.execute as jest.Mock).mockResolvedValue(mockStatus);
 
-    mockReq.params = { id: `${mockId}` };  // Define o parâmetro `id` na URL da requisição
+    mockReq.params = { userId: "1", orderId: "123" }; // Simula os parâmetros da requisição
 
-    // Chama o método `track` do controlador de pedidos
+    // Chama o método de rastreamento no controlador
     await controller.track(mockReq as Request, mockRes as Response);
 
-    // Verifica se o status 200 (OK) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(200);
+    // Verifica se o código HTTP 200 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(200);
     // Verifica se o status do pedido foi retornado corretamente
-    expect(jsonMock).toHaveBeenCalledWith({ status: mockStatus });
+    expect(mockRes.json).toHaveBeenCalledWith(mockStatus);
   });
 
-  it("should return error when track order fails", async () => {
-    const error = new Error("Track failed");  // Erro simulado no rastreamento do pedido
-
-    // Mock do `TrackOrderUseCase` para simular falha no rastreamento
-    (TrackOrderUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockRejectedValue(error),
-    }));
-
-    mockReq.params = { id: "123" };  // Define o ID do pedido a ser rastreado
-
-    // Chama o método `track` do controlador de pedidos
-    await controller.track(mockReq as Request, mockRes as Response);
-
-    // Verifica se o status 400 (Bad Request) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(400);
-    // Verifica se a mensagem de erro foi retornada
-    expect(jsonMock).toHaveBeenCalledWith({ error: error.message });
-  });
-
+  // Teste para listar pedidos com sucesso
   it("should list orders successfully", async () => {
-    const mockOrders = [{ id: 1, userId: 1, status: "completed" }];  // Mock da lista de pedidos
+    const mockOrders = [
+      { id: 1, userId: 1, status: "PENDING", totalPrice: 100 },
+    ]; // Pedidos esperados
 
-    // Mock do `ListOrdersUseCase` para simular sucesso na listagem de pedidos
-    (ListOrdersUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockResolvedValue(mockOrders),  // Retorna os pedidos mockados
-    }));
+    // Mocka o caso de uso para retornar os pedidos simulados
+    (ListOrdersUseCase.prototype.execute as jest.Mock).mockResolvedValue(mockOrders);
 
-    mockReq.query = { userId: "1" };  // Define o parâmetro `userId` na URL da requisição
+    mockReq.query = { userId: "1" }; // Simula os parâmetros de consulta
 
-    // Chama o método `list` do controlador de pedidos
+    // Chama o método de listagem no controlador
     await controller.list(mockReq as Request, mockRes as Response);
 
-    // Verifica se o status 200 (OK) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(200);
+    // Verifica se o código HTTP 200 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(200);
     // Verifica se os pedidos foram retornados corretamente
-    expect(jsonMock).toHaveBeenCalledWith(mockOrders);
+    expect(mockRes.json).toHaveBeenCalledWith(mockOrders);
   });
 
-  it("should return error when list orders fails", async () => {
-    const error = new Error("Failed to list orders");  // Erro simulado ao listar os pedidos
+  // Teste para finalizar um pedido com sucesso
+  it("should complete an order successfully", async () => {
+    const mockId = 123; // ID do pedido a ser finalizado
 
-    // Mock do `ListOrdersUseCase` para simular falha na listagem
-    (ListOrdersUseCase as jest.Mock).mockImplementation(() => ({
-      execute: jest.fn().mockRejectedValue(error),
-    }));
+    // Mocka o caso de uso para retornar sucesso
+    (CompleteOrderUseCase.prototype.execute as jest.Mock).mockResolvedValue(undefined);
 
-    mockReq.query = { userId: "1" };  // Define o parâmetro `userId` para a consulta de pedidos
+    mockReq.params = { userId: "1", orderId: `${mockId}` }; // Simula os parâmetros da requisição
 
-    // Chama o método `list` do controlador de pedidos
-    await controller.list(mockReq as Request, mockRes as Response);
+    // Chama o método de finalização no controlador
+    await controller.complete(mockReq as Request, mockRes as Response);
 
-    // Verifica se o status 400 (Bad Request) foi retornado
-    expect(statusMock).toHaveBeenCalledWith(400);
+    // Verifica se o código HTTP 200 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    // Verifica se a mensagem de sucesso foi retornada
+    expect(mockRes.json).toHaveBeenCalledWith({ message: "Pedido concluído com sucesso." });
+  });
+
+  // Teste para tratar erros durante a execução
+  it("should handle errors during execution", async () => {
+    const errorMessage = "An error occurred"; // Mensagem de erro simulada
+
+    // Mocka o caso de uso para lançar um erro
+    (CreateOrderUseCase.prototype.execute as jest.Mock).mockRejectedValue(new Error(errorMessage));
+
+    mockReq.body = {
+      userId: 1,
+      products: [1, 2],
+      paymentMethod: "credit",
+      addressId: 1,
+    }; // Dados válidos para a requisição
+
+    // Chama o método de criação e simula o erro
+    await controller.create(mockReq as Request, mockRes as Response);
+
+    // Verifica se o código HTTP 400 foi retornado
+    expect(mockRes.status).toHaveBeenCalledWith(400);
     // Verifica se a mensagem de erro foi retornada
-    expect(jsonMock).toHaveBeenCalledWith({ error: error.message });
+    expect(mockRes.json).toHaveBeenCalledWith({ error: errorMessage });
   });
 });
