@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { Order } from "./Order";
+import { Cart } from "./Cart";
 
-@Entity("users") 
+@Entity("users")
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -20,4 +21,8 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders!: Order[];
+
+  @OneToOne(() => Cart, (cart) => cart.user, { cascade: true })
+  @JoinColumn() 
+  cart!: Cart;
 }

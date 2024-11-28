@@ -3,6 +3,7 @@ import { CreateProductUseCase } from "../usecases/Product/CreateProductUseCase";
 import { ListProductsUseCase } from "../usecases/Product/ListProductsUseCase";
 import { EditProductUseCase } from "../usecases/Product/EditProductUseCase";
 import { ChangeProductStatusUseCase } from "../usecases/Product/ChangeProductStatusUseCase";
+import { GetProductByIdUseCase } from "../usecases/Product/GetProductByIdUseCase";
 
 export class ProductController {
   // Criar Produto
@@ -35,6 +36,26 @@ export class ProductController {
       return res.status(200).json(products);
     } catch (error) {
       return res.status(400).json({ error: (error as Error).message });
+    }
+  }
+
+  // Mostrar Detalhes de um Produto
+  async show(req: Request, res: Response): Promise<Response> {
+    try {
+      const { id } = req.params;
+
+      // Converte o ID para número e valida
+      const productId = Number(id);
+      if (isNaN(productId)) {
+        return res.status(400).json({ error: "ID inválido" });
+      }
+
+      const getProductById = new GetProductByIdUseCase();
+      const product = await getProductById.execute(productId);
+
+      return res.status(200).json(product);
+    } catch (error) {
+      return res.status(404).json({ error: (error as Error).message });
     }
   }
 
