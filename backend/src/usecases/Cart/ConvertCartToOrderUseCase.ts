@@ -1,13 +1,13 @@
 import { CartRepository } from "../../repositories/CartRepository";
 import { OrderRepository } from "../../repositories/OrderRepository";
-import { AddressRepository } from "../../repositories/AddressRepository"
+import { AddressRepository } from "../../repositories/AddressRepository";
 import { OrderStatus } from "../../entities/Order";
 
 export class ConvertCartToOrderUseCase {
-    async execute(cartId: number, paymentMethod: string, addressId: number) {
-        // Buscar o carrinho
+    async executeByUser(userId: number, paymentMethod: string, addressId: number) {
+        // Buscar o carrinho ativo do usuário
         const cart = await CartRepository.findOne({
-            where: { id: cartId, isOrder: false },
+            where: { user: { id: userId }, isOrder: false },
             relations: ["items", "user", "items.product"],
         });
 
@@ -17,7 +17,7 @@ export class ConvertCartToOrderUseCase {
 
         // Validar o endereço
         const address = await AddressRepository.findOne({
-            where: { id: addressId, user: cart.user },
+            where: { id: addressId, user: { id: userId } },
         });
 
         if (!address) {
@@ -25,12 +25,15 @@ export class ConvertCartToOrderUseCase {
         }
 
         // Calcular o preço total
-        const totalPrice = cart.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        const totalPrice = cart.items.reduce(
+            (sum, item) => sum + item.product.price * item.quantity,
+            0
+        );
 
         // Criar o pedido
         const order = OrderRepository.create({
             user: cart.user,
-            products: cart.items.map(item => item.product),
+            products: cart.items.map((item) => item.product),
             totalPrice,
             status: OrderStatus.PENDENTE,
             paymentMethod,
