@@ -1,9 +1,9 @@
 import { OrderRepository } from "../../repositories/OrderRepository";
 import { OrderStatus } from "../../entities/Order";
 
-export class CancelOrderUseCase {
+export class CompleteOrderUseCase {
   async execute(userId: number, orderId: number): Promise<void> {
-    // Buscar o pedido pelo ID e validar o usuário
+    // Buscar o pedido pelo ID e validar se pertence ao usuário
     const order = await OrderRepository.findOne({
       where: { id: orderId, user: { id: userId } },
       relations: ["user"], // Carregar informações do usuário
@@ -13,17 +13,16 @@ export class CancelOrderUseCase {
       throw new Error("Pedido não encontrado ou não pertence ao usuário.");
     }
 
-    // Verificar o status do pedido
-    if (order.status === OrderStatus.CANCELADO) {
-      throw new Error("Este pedido já foi cancelado.");
-    }
-
+    // Verificar se o pedido já foi concluído
     if (order.status === OrderStatus.CONCLUIDO) {
-      throw new Error("Não é possível cancelar um pedido concluído.");
+      throw new Error("Este pedido já foi concluído.");
     }
 
-    // Atualizar o status para cancelado
-    order.status = OrderStatus.CANCELADO;
+    // Atualizar o status para concluído e registrar a data de conclusão
+    order.status = OrderStatus.CONCLUIDO;
+    order.completedAt = new Date();
+
+    // Salvar as alterações no banco de dados
     await OrderRepository.save(order);
   }
 }
