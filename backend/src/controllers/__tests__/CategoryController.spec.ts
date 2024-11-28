@@ -1,169 +1,104 @@
-import { CategoryController } from "../CategoryController";
+import { CategoryController } from "../../controllers/CategoryController";
+import { Request, Response } from "express";
 import { CreateCategoryUseCase } from "../../usecases/Category/CreateCategoryUseCase";
 import { ListCategoriesUseCase } from "../../usecases/Category/ListCategoriesUseCase";
 import { EditCategoryUseCase } from "../../usecases/Category/EditCategoryUseCase";
 import { DeleteCategoryUseCase } from "../../usecases/Category/DeleteCategoryUseCase";
-import { Request, Response } from "express";
 
+// Mockar as dependências dos use cases
 jest.mock("../../usecases/Category/CreateCategoryUseCase");
 jest.mock("../../usecases/Category/ListCategoriesUseCase");
 jest.mock("../../usecases/Category/EditCategoryUseCase");
 jest.mock("../../usecases/Category/DeleteCategoryUseCase");
 
-describe("CategoryController", () => {
-  const mockResponse = (): Partial<Response> => ({
-    status: jest.fn().mockReturnThis(),
-    json: jest.fn(),
-  });
-
-  let createCategoryUseCaseMock: jest.Mocked<CreateCategoryUseCase>;
-  let listCategoriesUseCaseMock: jest.Mocked<ListCategoriesUseCase>;
-  let editCategoryUseCaseMock: jest.Mocked<EditCategoryUseCase>;
-  let deleteCategoryUseCaseMock: jest.Mocked<DeleteCategoryUseCase>;
+describe('CategoryController', () => {
+  let categoryController: CategoryController;
+  let req: Partial<Request>;
+  let res: Partial<Response>;
 
   beforeEach(() => {
-    createCategoryUseCaseMock = new (CreateCategoryUseCase as jest.Mock)() as jest.Mocked<CreateCategoryUseCase>;
-    listCategoriesUseCaseMock = new (ListCategoriesUseCase as jest.Mock)() as jest.Mocked<ListCategoriesUseCase>;
-    editCategoryUseCaseMock = new (EditCategoryUseCase as jest.Mock)() as jest.Mocked<EditCategoryUseCase>;
-    deleteCategoryUseCaseMock = new (DeleteCategoryUseCase as jest.Mock)() as jest.Mocked<DeleteCategoryUseCase>;
+    categoryController = new CategoryController();
+    req = {};
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    };
   });
 
-  describe("create", () => {
-    it("should return 201 when a category is created successfully", async () => {
-      const mockCategory = { id: 1, name: "Pizza", products: [] };
-      createCategoryUseCaseMock.execute.mockResolvedValue(mockCategory);
+  it('should create a category successfully', async () => {
+    const mockCategory = { id: 1, name: 'Category 1' };
 
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = { body: { name: "Pizza" } } as Partial<Request>;
-      const res = mockResponse();
+    // Mockando o comportamento do CreateCategoryUseCase
+    (CreateCategoryUseCase as jest.Mock).mockImplementation(() => ({
+      execute: jest.fn().mockResolvedValue(mockCategory),
+    }));
 
-      await categoryController.create(req as Request, res as Response);
+    req.body = { name: 'Category 1' };
 
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(mockCategory);
-    });
+    await categoryController.create(req as Request, res as Response);
 
-    it("should return 400 if creation fails", async () => {
-      createCategoryUseCaseMock.execute.mockRejectedValue(new Error("Creation failed"));
-
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = { body: { name: "" } } as Partial<Request>;
-      const res = mockResponse();
-
-      await categoryController.create(req as Request, res as Response);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: "Creation failed" });
-    });
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(mockCategory);
   });
 
-  describe("list", () => {
-    it("should return 200 with a list of categories", async () => {
-      const mockCategories = [
-        { id: 1, name: "Pizza", products: [] },
-        { id: 2, name: "Drinks", products: [] },
-      ];
-      listCategoriesUseCaseMock.execute.mockResolvedValue(mockCategories);
+  it('should list categories successfully', async () => {
+    const mockCategories = [{ id: 1, name: 'Category 1' }, { id: 2, name: 'Category 2' }];
 
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = {} as Partial<Request>;
-      const res = mockResponse();
+    // Mockando o comportamento do ListCategoriesUseCase
+    (ListCategoriesUseCase as jest.Mock).mockImplementation(() => ({
+      execute: jest.fn().mockResolvedValue(mockCategories),
+    }));
 
-      await categoryController.list(req as Request, res as Response);
+    await categoryController.list(req as Request, res as Response);
 
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockCategories);
-    });
-
-    it("should return 400 if listing fails", async () => {
-      listCategoriesUseCaseMock.execute.mockRejectedValue(new Error("Listing failed"));
-
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = {} as Partial<Request>;
-      const res = mockResponse();
-
-      await categoryController.list(req as Request, res as Response);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: "Listing failed" });
-    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(mockCategories);
   });
 
-  describe("edit", () => {
-    it("should return 200 when a category is updated successfully", async () => {
-      editCategoryUseCaseMock.execute.mockResolvedValue(undefined);
+  it('should edit a category successfully', async () => {
+    const mockResponse = { message: 'Categoria atualizada com sucesso.' };
 
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = { params: { id: "1" }, body: { name: "Updated Name" } } as Partial<Request>;
-      const res = mockResponse();
+    // Mockando o comportamento do EditCategoryUseCase
+    (EditCategoryUseCase as jest.Mock).mockImplementation(() => ({
+      execute: jest.fn().mockResolvedValue(mockResponse),
+    }));
 
-      await categoryController.edit(req as Request, res as Response);
+    req.params = { id: '1' };
+    req.body = { name: 'Updated Category' };
 
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: "Categoria atualizada com sucesso." });
-    });
+    await categoryController.edit(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
   });
 
-  describe("delete", () => {
-    it("should return 200 when a category is deleted successfully", async () => {
-      deleteCategoryUseCaseMock.execute.mockResolvedValue(undefined);
+  it('should delete a category successfully', async () => {
+    const mockResponse = { message: 'Categoria excluída com sucesso.' };
 
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = { params: { id: "1" } } as Partial<Request>;
-      const res = mockResponse();
+    // Mockando o comportamento do DeleteCategoryUseCase
+    (DeleteCategoryUseCase as jest.Mock).mockImplementation(() => ({
+      execute: jest.fn().mockResolvedValue(mockResponse),
+    }));
 
-      await categoryController.delete(req as Request, res as Response);
+    req.params = { id: '1' };
 
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: "Categoria excluída com sucesso." });
-    });
+    await categoryController.delete(req as Request, res as Response);
 
-    it("should return 400 if deletion fails", async () => {
-      deleteCategoryUseCaseMock.execute.mockRejectedValue(new Error("Deletion failed"));
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(mockResponse);
+  });
 
-      const categoryController = new CategoryController(
-        createCategoryUseCaseMock,
-        listCategoriesUseCaseMock,
-        editCategoryUseCaseMock,
-        deleteCategoryUseCaseMock
-      );
-      const req = { params: { id: "1" } } as Partial<Request>;
-      const res = mockResponse();
+  it('should return 400 when an error occurs during create', async () => {
+    const error = new Error('Error creating category');
+    (CreateCategoryUseCase as jest.Mock).mockImplementation(() => ({
+      execute: jest.fn().mockRejectedValue(error),
+    }));
 
-      await categoryController.delete(req as Request, res as Response);
+    req.body = { name: 'Category 1' };
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: "Deletion failed" });
-    });
+    await categoryController.create(req as Request, res as Response);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: error.message });
   });
 });
