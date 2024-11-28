@@ -33,7 +33,9 @@ describe('ProductRepository', () => {
     // Chamando o repositório mockado corretamente
     const result = await productRepository.find();
 
+    // Verifica se o método find foi chamado corretamente
     expect(productRepository.find).toHaveBeenCalled();
+    // Verifica se o resultado da execução é igual ao mock de produtos
     expect(result).toEqual(mockProducts);
   });
 
@@ -41,9 +43,12 @@ describe('ProductRepository', () => {
     const mockProduct = new Product(); // Usando instância completa de Product
     productRepository.save.mockResolvedValue(mockProduct);
 
+    // Chamando o repositório para salvar o mock de produto
     const result = await productRepository.save(mockProduct);
 
+    // Verifica se o método save foi chamado corretamente com o mock de produto
     expect(productRepository.save).toHaveBeenCalledWith(mockProduct);
+    // Verifica se o resultado da execução é igual ao mock de produto
     expect(result).toEqual(mockProduct);
   });
 
@@ -51,9 +56,12 @@ describe('ProductRepository', () => {
     const mockProduct = new Product(); // Usando instância completa de Product
     productRepository.remove.mockResolvedValue(mockProduct);
 
+    // Chamando o repositório para remover o mock de produto
     const result = await productRepository.remove(mockProduct);
 
+    // Verifica se o método remove foi chamado corretamente com o mock de produto
     expect(productRepository.remove).toHaveBeenCalledWith(mockProduct);
+    // Verifica se o resultado da execução é igual ao mock de produto
     expect(result).toEqual(mockProduct);
   });
 });

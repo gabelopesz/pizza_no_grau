@@ -33,7 +33,9 @@ describe('OrderRepository', () => {
     // Chamando o repositório mockado corretamente
     const result = await orderRepository.find();
 
+    // Verifica se o método find foi chamado corretamente
     expect(orderRepository.find).toHaveBeenCalled();
+    // Verifica se o retorno é igual ao valor mockado (mockOrders)
     expect(result).toEqual(mockOrders);
   });
 
@@ -41,9 +43,12 @@ describe('OrderRepository', () => {
     const mockOrder = new Order(); // Usando instância completa de Order
     orderRepository.save.mockResolvedValue(mockOrder);
 
+    // Chama o método save no repositório mockado com o mockOrder
     const result = await orderRepository.save(mockOrder);
 
+    // Verifica se o método save foi chamado com o mockOrder como argumento
     expect(orderRepository.save).toHaveBeenCalledWith(mockOrder);
+    // Verifica se o resultado retornado é igual ao mockOrder
     expect(result).toEqual(mockOrder);
   });
 
@@ -51,9 +56,12 @@ describe('OrderRepository', () => {
     const mockOrder = new Order(); // Usando instância completa de Order
     orderRepository.remove.mockResolvedValue(mockOrder);
 
+    // Chama o método remove no repositório mockado com o mockOrder
     const result = await orderRepository.remove(mockOrder);
 
+    // Verifica se o método remove foi chamado com o mockOrder como argumento
     expect(orderRepository.remove).toHaveBeenCalledWith(mockOrder);
+    // Verifica se o resultado retornado é igual ao mockOrder
     expect(result).toEqual(mockOrder);
   });
 });

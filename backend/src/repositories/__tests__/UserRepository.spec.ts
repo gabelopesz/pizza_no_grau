@@ -33,7 +33,9 @@ describe('UserRepository', () => {
     // Chamando o repositório mockado corretamente
     const result = await userRepository.find();
 
+    // Verifica se o método find foi chamado corretamente
     expect(userRepository.find).toHaveBeenCalled();
+    // Verifica se o resultado da execução é igual ao mock de usuários
     expect(result).toEqual(mockUsers);
   });
 
@@ -43,7 +45,9 @@ describe('UserRepository', () => {
 
     const result = await userRepository.save(mockUser);
 
+    // Verifica se o método save foi chamado corretamente com o mock de usuário
     expect(userRepository.save).toHaveBeenCalledWith(mockUser);
+    // Verifica se o resultado da execução é igual ao mock de usuário
     expect(result).toEqual(mockUser);
   });
 
@@ -53,7 +57,9 @@ describe('UserRepository', () => {
 
     const result = await userRepository.remove(mockUser);
 
+    // Verifica se o método remove foi chamado corretamente com o mock de usuário
     expect(userRepository.remove).toHaveBeenCalledWith(mockUser);
+    // Verifica se o resultado da execução é igual ao mock de usuário
     expect(result).toEqual(mockUser);
   });
 });

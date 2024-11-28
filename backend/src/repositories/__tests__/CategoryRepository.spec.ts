@@ -33,7 +33,9 @@ describe('CategoryRepository', () => {
     // Chamando o repositório mockado corretamente
     const result = await categoryRepository.find();
 
+    // Verifica se o método find foi chamado corretamente
     expect(categoryRepository.find).toHaveBeenCalled();
+    // Verifica se o retorno do método find é igual ao valor mockado
     expect(result).toEqual(mockCategories);
   });
 
@@ -41,9 +43,12 @@ describe('CategoryRepository', () => {
     const mockCategory = new Category(); // Usando instância completa de Category
     categoryRepository.save.mockResolvedValue(mockCategory);
 
+    // Chama o método save no repositório mockado com o mockCategory
     const result = await categoryRepository.save(mockCategory);
 
+    // Verifica se o método save foi chamado com o mockCategory como argumento
     expect(categoryRepository.save).toHaveBeenCalledWith(mockCategory);
+    // Verifica se o resultado retornado é igual ao mockCategory
     expect(result).toEqual(mockCategory);
   });
 
@@ -51,9 +56,12 @@ describe('CategoryRepository', () => {
     const mockCategory = new Category(); // Usando instância completa de Category
     categoryRepository.remove.mockResolvedValue(mockCategory);
 
+    // Chama o método remove no repositório mockado com o mockCategory
     const result = await categoryRepository.remove(mockCategory);
 
+    // Verifica se o método remove foi chamado com o mockCategory como argumento
     expect(categoryRepository.remove).toHaveBeenCalledWith(mockCategory);
+    // Verifica se o resultado retornado é igual ao mockCategory
     expect(result).toEqual(mockCategory);
   });
 });
