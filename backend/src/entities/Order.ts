@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { User } from "./User";
 import { Product } from "./Product";
+import { Address } from "./Address";
 
 export enum OrderStatus {
   PENDENTE = "pendente",
@@ -27,9 +28,12 @@ export class Order {
   })
   user!: User;
 
+  @ManyToOne(() => Address, { nullable: false, onDelete: "SET NULL" })
+  address!: Address; // Endereço associado ao pedido
+
   @ManyToMany(() => Product, (product) => product.orders)
   @JoinTable({
-    name: "orders_products", // Nome da tabela de junção
+    name: "orders_products", 
     joinColumn: { name: "order_id", referencedColumnName: "id" },
     inverseJoinColumn: { name: "product_id", referencedColumnName: "id" },
   })
@@ -46,7 +50,7 @@ export class Order {
   status!: OrderStatus;
 
   @Column()
-  paymentMethod!: string; // Ex.: "cash_on_delivery", "online_payment"
+  paymentMethod!: string;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import { Order } from "./Order";
 import { Cart } from "./Cart";
+import { Address } from "./Address";
 
 @Entity("users")
 export class User {
@@ -23,6 +24,9 @@ export class User {
   orders!: Order[];
 
   @OneToOne(() => Cart, (cart) => cart.user, { cascade: true })
-  @JoinColumn() 
+  @JoinColumn()
   cart!: Cart;
+
+  @OneToMany(() => Address, (address) => address.user, { cascade: true })
+  addresses!: Address[]; 
 }

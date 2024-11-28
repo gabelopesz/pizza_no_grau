@@ -1,13 +1,27 @@
 import { CartRepository } from "../../repositories/CartRepository";
 import { OrderRepository } from "../../repositories/OrderRepository";
+import { AddressRepository } from "../../repositories/AddressRepository"
 import { OrderStatus } from "../../entities/Order";
 
 export class ConvertCartToOrderUseCase {
-    async execute(cartId: number, paymentMethod: string) {
-        const cart = await CartRepository.findOne({ where: { id: cartId, isOrder: false }, relations: ["items", "user", "items.product"] });
+    async execute(cartId: number, paymentMethod: string, addressId: number) {
+        // Buscar o carrinho
+        const cart = await CartRepository.findOne({
+            where: { id: cartId, isOrder: false },
+            relations: ["items", "user", "items.product"],
+        });
 
         if (!cart) {
             throw new Error("Carrinho não encontrado ou já convertido em pedido.");
+        }
+
+        // Validar o endereço
+        const address = await AddressRepository.findOne({
+            where: { id: addressId, user: cart.user },
+        });
+
+        if (!address) {
+            throw new Error("Endereço inválido ou não encontrado.");
         }
 
         // Calcular o preço total
@@ -20,6 +34,7 @@ export class ConvertCartToOrderUseCase {
             totalPrice,
             status: OrderStatus.PENDENTE,
             paymentMethod,
+            address, // Associar o endereço ao pedido
         });
 
         const savedOrder = await OrderRepository.save(order);

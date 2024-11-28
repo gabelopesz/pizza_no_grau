@@ -7,6 +7,7 @@ import { productRoutes } from "./routes/productRoutes";
 import { orderRoutes } from "./routes/orderRoutes";
 import { categoryRoutes } from "./routes/categoryRoutes";
 import { cartRoutes } from "./routes/cartRoutes";
+import { addressRoutes } from "./routes/addressRoutes";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ AppDataSource.initialize()
     app.use("/products", productRoutes);
     app.use("/orders", orderRoutes);
     app.use("/carts", cartRoutes);
+    app.use("/addresses", addressRoutes);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
