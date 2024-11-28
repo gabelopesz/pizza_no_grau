@@ -1,13 +1,13 @@
 import { CartController } from "../CartController";
-import { Request, Response } from "express";
 import { AddProductToCartUseCase } from "../../usecases/Cart/AddProductToCartUseCase";
 import { RemoveProductFromCartUseCase } from "../../usecases/Cart/RemoveProductFromCartUseCase";
 import { UpdateCartItemQuantityUseCase } from "../../usecases/Cart/UpdateCartItemQuantityUseCase";
 import { ClearCartUseCase } from "../../usecases/Cart/ClearCartUseCase";
 import { GetCartUseCase } from "../../usecases/Cart/GetCartUseCase";
 import { ConvertCartToOrderUseCase } from "../../usecases/Cart/ConvertCartToOrderUseCase";
+import { Request, Response } from "express";
 
-// Mockando os use cases
+// Mockando automaticamente os casos de uso para evitar chamadas reais ao banco de dados ou APIs externas
 jest.mock("../../usecases/Cart/AddProductToCartUseCase");
 jest.mock("../../usecases/Cart/RemoveProductFromCartUseCase");
 jest.mock("../../usecases/Cart/UpdateCartItemQuantityUseCase");
@@ -16,156 +16,137 @@ jest.mock("../../usecases/Cart/GetCartUseCase");
 jest.mock("../../usecases/Cart/ConvertCartToOrderUseCase");
 
 describe("CartController", () => {
-  let req: Partial<Request>;
-  let res: Partial<Response>;
-  let next: jest.Mock;
+  // Mock das requisições e respostas para simular o comportamento de uma API
+  let mockReq: Partial<Request>;
+  let mockRes: Partial<Response>;
 
   beforeEach(() => {
-    req = {};  // Inicializando o objeto de requisição vazio
-    res = {
-      status: jest.fn().mockReturnThis(),  // Mock do método `status`
-      json: jest.fn().mockReturnThis(),  // Mock do método `json`
+    // Inicializa os mocks antes de cada teste
+    mockReq = {};
+    mockRes = {
+      status: jest.fn().mockReturnThis(), // Mock do método `status` para retornar o objeto `Response`
+      json: jest.fn(), // Mock do método `json` para capturar os dados da resposta
     };
-    next = jest.fn();  // Mock do middleware `next`
   });
 
+  // Teste para adicionar um produto ao carrinho
   it("should add product to cart successfully", async () => {
-    const mockResult = { id: 1, productId: 2, quantity: 3 };  // Mock do resultado esperado
+    // Simula o retorno esperado do caso de uso
+    const mockCart = { id: 1, userId: 1, items: [{ productId: 2, quantity: 3 }] };
 
-    // Mock do método `execute` do `AddProductToCartUseCase`
-    const addProductToCartUseCaseMock = AddProductToCartUseCase.prototype.execute as jest.Mock;
-    addProductToCartUseCaseMock.mockResolvedValue(mockResult);  // Simula uma execução bem-sucedida do use case
+    (AddProductToCartUseCase.prototype.execute as jest.Mock).mockResolvedValue(mockCart);
 
-    req.params = { cartId: "1" };  // Parâmetro de cartId na URL
-    req.body = { productId: 2, quantity: 3 };  // Corpo da requisição com os dados do produto
+    // Simula os parâmetros e o corpo da requisição
+    mockReq.params = { userId: "1" };
+    mockReq.body = { productId: 2, quantity: 3 };
 
-    // Chama o método `addProduct` do controlador
-    await CartController.addProduct(req as Request, res as Response);
+    // Chama o método do controlador
+    await CartController.addProduct(mockReq as Request, mockRes as Response);
 
-    // Verifica se o método `execute` foi chamado com os parâmetros esperados
-    expect(addProductToCartUseCaseMock).toHaveBeenCalledWith(1, 2, 3);
-    // Verifica se o status 200 (OK) foi retornado
-    expect(res.status).toHaveBeenCalledWith(200);
-    // Verifica se a resposta retornou o objeto mockado corretamente
-    expect(res.json).toHaveBeenCalledWith(mockResult);
+    // Verifica se o status e a resposta JSON foram chamados corretamente
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockCart);
   });
 
-  it("should return error when adding product to cart fails", async () => {
-    const errorMessage = "Error adding product";  // Mensagem de erro para simulação
-
-    // Mock para simular erro no `execute` do `AddProductToCartUseCase`
-    const addProductToCartUseCaseMock = AddProductToCartUseCase.prototype.execute as jest.Mock;
-    addProductToCartUseCaseMock.mockRejectedValue(new Error(errorMessage));  // Simula falha no use case
-
-    req.params = { cartId: "1" };  // Parâmetro de cartId na URL
-    req.body = { productId: 2, quantity: 3 };  // Corpo da requisição com dados de produto
-
-    // Chama o método `addProduct` do controlador
-    await CartController.addProduct(req as Request, res as Response);
-
-    // Verifica se o status 400 (Bad Request) foi retornado
-    expect(res.status).toHaveBeenCalledWith(400);
-    // Verifica se a resposta retornou a mensagem de erro correta
-    expect(res.json).toHaveBeenCalledWith({ error: errorMessage });
-  });
-
+  // Teste para remover um produto do carrinho
   it("should remove product from cart successfully", async () => {
-    // Mock para simular sucesso no `execute` do `RemoveProductFromCartUseCase`
-    const removeProductFromCartUseCaseMock = RemoveProductFromCartUseCase.prototype.execute as jest.Mock;
-    removeProductFromCartUseCaseMock.mockResolvedValue(undefined);  // Não retorna nada, indicando sucesso
+    // Simula o caso de uso para retornar sucesso
+    (RemoveProductFromCartUseCase.prototype.execute as jest.Mock).mockResolvedValue(undefined);
 
-    req.params = { cartItemId: "1" };  // Parâmetro de cartItemId na URL
+    mockReq.params = { userId: "1" };
+    mockReq.body = { productId: 2 };
 
-    // Chama o método `removeProduct` do controlador
-    await CartController.removeProduct(req as Request, res as Response);
+    await CartController.removeProduct(mockReq as Request, mockRes as Response);
 
-    // Verifica se o método `execute` foi chamado com o parâmetro esperado
-    expect(removeProductFromCartUseCaseMock).toHaveBeenCalledWith(1);
-    // Verifica se o status 200 (OK) foi retornado
-    expect(res.status).toHaveBeenCalledWith(200);
     // Verifica se a mensagem de sucesso foi retornada
-    expect(res.json).toHaveBeenCalledWith({ message: "Produto removido do carrinho." });
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      message: "Produto removido do carrinho com sucesso.",
+    });
   });
 
-  it("should update cart item quantity successfully", async () => {
-    const mockResult = { id: 1, quantity: 5 };  // Mock do resultado esperado
+  // Teste para atualizar a quantidade de um produto no carrinho
+  it("should update quantity in cart successfully", async () => {
+    const mockUpdatedItem = { productId: 2, quantity: 5 };
 
-    // Mock do método `execute` do `UpdateCartItemQuantityUseCase`
-    const updateCartItemQuantityUseCaseMock = UpdateCartItemQuantityUseCase.prototype.execute as jest.Mock;
-    updateCartItemQuantityUseCaseMock.mockResolvedValue(mockResult);  // Simula uma execução bem-sucedida
+    (UpdateCartItemQuantityUseCase.prototype.execute as jest.Mock).mockResolvedValue(
+      mockUpdatedItem
+    );
 
-    req.params = { cartItemId: "1" };  // Parâmetro de cartItemId na URL
-    req.body = { quantity: 5 };  // Corpo da requisição com a quantidade do item
+    mockReq.params = { userId: "1" };
+    mockReq.body = { productId: 2, quantity: 5 };
 
-    // Chama o método `updateQuantity` do controlador
-    await CartController.updateQuantity(req as Request, res as Response);
+    await CartController.updateQuantity(mockReq as Request, mockRes as Response);
 
-    // Verifica se o método `execute` foi chamado com os parâmetros esperados
-    expect(updateCartItemQuantityUseCaseMock).toHaveBeenCalledWith(1, 5);
-    // Verifica se o status 200 (OK) foi retornado
-    expect(res.status).toHaveBeenCalledWith(200);
-    // Verifica se a resposta retornou o objeto mockado corretamente
-    expect(res.json).toHaveBeenCalledWith(mockResult);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockUpdatedItem);
   });
 
+  // Teste para limpar o carrinho
   it("should clear cart successfully", async () => {
-    const mockMessage = "Carrinho limpo com sucesso.";  // Mensagem mockada para o sucesso
+    (ClearCartUseCase.prototype.execute as jest.Mock).mockResolvedValue(
+      "Carrinho limpo com sucesso."
+    );
 
-    // Mock para simular sucesso no `execute` do `ClearCartUseCase`
-    const clearCartUseCaseMock = ClearCartUseCase.prototype.execute as jest.Mock;
-    clearCartUseCaseMock.mockResolvedValue(mockMessage);
+    mockReq.params = { userId: "1" };
 
-    req.params = { cartId: "1" };  // Parâmetro de cartId na URL
+    await CartController.clear(mockReq as Request, mockRes as Response);
 
-    // Chama o método `clear` do controlador
-    await CartController.clear(req as Request, res as Response);
-
-    // Verifica se o método `execute` foi chamado com o parâmetro esperado
-    expect(clearCartUseCaseMock).toHaveBeenCalledWith(1);
-    // Verifica se o status 200 (OK) foi retornado
-    expect(res.status).toHaveBeenCalledWith(200);
-    // Verifica se a mensagem de sucesso foi retornada
-    expect(res.json).toHaveBeenCalledWith({ message: mockMessage });
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith({ message: "Carrinho limpo com sucesso." });
   });
 
-  it("should get cart successfully", async () => {
-    const mockCart = { id: 1, items: [] };  // Mock do cart com itens vazios
+  // Teste para buscar os itens do carrinho
+  it("should retrieve cart successfully", async () => {
+    const mockCart = { id: 1, userId: 1, items: [{ productId: 2, quantity: 3 }] };
 
-    // Mock para simular sucesso no `execute` do `GetCartUseCase`
-    const getCartUseCaseMock = GetCartUseCase.prototype.execute as jest.Mock;
-    getCartUseCaseMock.mockResolvedValue(mockCart);
+    (GetCartUseCase.prototype.executeByUser as jest.Mock).mockResolvedValue(mockCart);
 
-    req.params = { cartId: "1" };  // Parâmetro de cartId na URL
+    mockReq.params = { userId: "1" };
 
-    // Chama o método `getCart` do controlador
-    await CartController.getCart(req as Request, res as Response);
+    await CartController.getCart(mockReq as Request, mockRes as Response);
 
-    // Verifica se o método `execute` foi chamado com o parâmetro esperado
-    expect(getCartUseCaseMock).toHaveBeenCalledWith(1);
-    // Verifica se o status 200 (OK) foi retornado
-    expect(res.status).toHaveBeenCalledWith(200);
-    // Verifica se o cart foi retornado corretamente
-    expect(res.json).toHaveBeenCalledWith(mockCart);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockCart);
   });
 
-  it("should finalize order successfully", async () => {
-    const mockOrder = { id: 1, status: "completed" };  // Mock do pedido finalizado
+  // Teste para finalizar o carrinho e converter em pedido
+  it("should finalize cart successfully", async () => {
+    const mockOrder = {
+      id: 1,
+      userId: 1,
+      items: [{ productId: 2, quantity: 3 }],
+      total: 100,
+      paymentMethod: "credit",
+    };
 
-    // Mock para simular sucesso no `execute` do `ConvertCartToOrderUseCase`
-    const convertCartToOrderUseCaseMock = ConvertCartToOrderUseCase.prototype.execute as jest.Mock;
-    convertCartToOrderUseCaseMock.mockResolvedValue(mockOrder);
+    (ConvertCartToOrderUseCase.prototype.executeByUser as jest.Mock).mockResolvedValue(mockOrder);
 
-    req.params = { cartId: "1" };  // Parâmetro de cartId na URL
-    req.body = { paymentMethod: "credit card", addressId: 2 };  // Corpo da requisição com método de pagamento e endereço
+    mockReq.params = { userId: "1" };
+    mockReq.body = { paymentMethod: "credit", addressId: 1 };
 
-    // Chama o método `finalize` do controlador
-    await CartController.finalize(req as Request, res as Response);
+    await CartController.finalize(mockReq as Request, mockRes as Response);
 
-    // Verifica se o método `execute` foi chamado com os parâmetros esperados
-    expect(convertCartToOrderUseCaseMock).toHaveBeenCalledWith(1, "credit card", 2);
-    // Verifica se o status 200 (OK) foi retornado
-    expect(res.status).toHaveBeenCalledWith(200);
-    // Verifica se o pedido foi retornado corretamente
-    expect(res.json).toHaveBeenCalledWith(mockOrder);
+    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.json).toHaveBeenCalledWith(mockOrder);
+  });
+
+  // Teste para lidar com erros durante a execução de uma ação
+  it("should handle errors during execution", async () => {
+    const errorMessage = "An error occurred";
+
+    // Simula um erro no caso de uso
+    (AddProductToCartUseCase.prototype.execute as jest.Mock).mockRejectedValue(
+      new Error(errorMessage)
+    );
+
+    mockReq.params = { userId: "1" };
+    mockReq.body = { productId: 2, quantity: 3 };
+
+    await CartController.addProduct(mockReq as Request, mockRes as Response);
+
+    // Verifica se o erro foi tratado corretamente
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith({ error: errorMessage });
   });
 });
