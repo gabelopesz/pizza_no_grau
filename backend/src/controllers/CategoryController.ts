@@ -5,11 +5,16 @@ import { EditCategoryUseCase } from "../usecases/Category/EditCategoryUseCase";
 import { DeleteCategoryUseCase } from "../usecases/Category/DeleteCategoryUseCase";
 
 export class CategoryController {
+  private createCategoryUseCase: CreateCategoryUseCase;
+
+  constructor(createCategoryUseCase: CreateCategoryUseCase) {
+    this.createCategoryUseCase = createCategoryUseCase;
+  }
+
   async create(req: Request, res: Response): Promise<Response> {
     try {
       const { name } = req.body;
-      const createCategory = new CreateCategoryUseCase();
-      const category = await createCategory.execute({ name });
+      const category = await this.createCategoryUseCase.execute({ name });
       return res.status(201).json(category);
     } catch (error) {
       return res.status(400).json({ error: (error as Error).message });
