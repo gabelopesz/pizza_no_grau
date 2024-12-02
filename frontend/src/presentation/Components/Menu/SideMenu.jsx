@@ -97,7 +97,7 @@ const menuSections = [
   },
   {
     title: "Informações",
-    items: [{ text: "Sobre a pizzaria", icon: <Info />, path: "/about" }],
+    items: [{ text: "Sobre a pizzaria", icon: <Info />, path: "/pizzaria" }],
   },
   {
     title: "Ações",

@@ -6,6 +6,7 @@ import AddCategory from "./presentation/pages/categories/AddCategory";
 import CategoriesCrud from "./presentation/pages/categories/CategoriesCrud";
 import EditCategory from "./presentation/pages/categories/EditCategory";
 import Menu from "./presentation/pages/menu/Menu";
+import SobrePizzaria from "./presentation/pages/pizzaria/SobrePizzaria";
 import AddProduct from "./presentation/pages/products/AddProduct";
 import EditProduct from "./presentation/pages/products/EditProduct";
 import ProductCRUD from "./presentation/pages/products/ProductCRUD";
@@ -33,6 +34,7 @@ const App = () => {
               <Route path="/add-product" element={<AddProduct />} />
               <Route path="/edit-product/:id" element={<EditProduct />} />
               <Route path="/account" element={<MyAccount />} />
+              <Route path="/pizzaria" element={<SobrePizzaria />} />
             </Routes>
           </main>
         </div>
