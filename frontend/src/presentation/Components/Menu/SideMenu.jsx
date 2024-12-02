@@ -101,7 +101,7 @@ const menuSections = [
   },
   {
     title: "Ações",
-    items: [{ text: "Sair", icon: <ExitToApp />, path: "/logout" }],
+    items: [{ text: "Sair", icon: <ExitToApp />, path: "/login" }],
   },
 ];
 
