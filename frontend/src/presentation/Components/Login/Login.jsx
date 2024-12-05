@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import { TextField, Box, Button, Typography, Link, InputAdornment } from "@mui/material";
 import { FaLock, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // Importando useNavigate
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate(); // Hook de navegação
+
+  // Função chamada no submit do formulário
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Dados de Login:", { username, password });
+    // Realiza o redirecionamento para o menu após o login
+    navigate("/menu");
   };
+
+  // Função para redirecionar para a tela de registro
+  const handleRegisterRedirect = () => {
+    navigate("/register"); // Redireciona para a página de registro
+  };
+
   return (
     <Box
       sx={{
@@ -24,11 +36,7 @@ const Login = () => {
       <Typography variant="h4" component="h1" sx={{ marginBottom: 2, color: "#333" }}>
         Login
       </Typography>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-      >
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
           fullWidth
           variant="outlined"
@@ -89,7 +97,11 @@ const Login = () => {
         </Button>
         <Typography sx={{ fontSize: "14.5px", marginTop: 2 }}>
           Não possui uma conta?{" "}
-          <Link href="/register" underline="hover" sx={{ color: "#F54749", fontWeight: "800" }}>
+          <Link
+            onClick={handleRegisterRedirect} // Chama o redirecionamento para o registro
+            underline="hover"
+            sx={{ color: "#F54749", fontWeight: "800", cursor: "pointer" }}
+          >
             Registre-se
           </Link>
         </Typography>
@@ -97,4 +109,5 @@ const Login = () => {
     </Box>
   );
 };
+
 export default Login;

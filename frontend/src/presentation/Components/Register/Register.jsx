@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { TextField, Box, Button, Typography, Link, InputAdornment } from "@mui/material";
 import { FaLock, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // Importando useNavigate
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate(); // Hook de navegação
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -15,6 +17,8 @@ const Register = () => {
       return;
     }
     console.log("Dados de Registro:", { name, email, password });
+    alert("Registrado com sucesso!");
+    navigate("/"); // Redireciona para a página de login após o registro
   };
 
   return (
@@ -114,7 +118,11 @@ const Register = () => {
         </Button>
         <Typography sx={{ fontSize: "14.5px", marginTop: 2 }}>
           Já possui uma conta?{" "}
-          <Link href="/login" underline="hover" sx={{ color: "#F54749", fontWeight: "800" }}>
+          <Link
+            onClick={() => navigate("/")} // Redireciona para login
+            underline="hover"
+            sx={{ color: "#F54749", fontWeight: "800", cursor: "pointer" }}
+          >
             Login
           </Link>
         </Typography>
