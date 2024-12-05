@@ -20,7 +20,7 @@ const AddUser = () => {
     e.preventDefault();
     if (formData.name.trim() && formData.email.trim() && formData.password.trim()) {
       await addUser(formData);
-      navigate('/');
+      navigate('/users');
     } else {
       alert('Por favor, preencha todos os campos.');
     }

@@ -20,7 +20,7 @@ const EditProduct = () => {
     try {
       await updateProduct(product.id, data);
       alert("Produto atualizado com sucesso!");
-      navigate("/"); 
+      navigate("/products"); 
     } catch (error) {
       console.error("Erro ao editar produto:", error);
     }

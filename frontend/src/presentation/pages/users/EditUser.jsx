@@ -28,7 +28,7 @@ const EditUser = () => {
           });
         } else {
           alert("Usuário não encontrado!");
-          navigate("/"); // Redireciona para a página principal
+          navigate("/users"); // Redireciona para a página de usuários
         }
       } catch (error) {
         console.error("Erro ao carregar o usuário:", error);
@@ -50,7 +50,7 @@ const EditUser = () => {
     try {
       await editUser(id, formData); // Atualiza os dados do usuário
       alert("Usuário atualizado com sucesso!");
-      navigate("/"); // Redireciona para a página principal
+      navigate("/users"); // Redireciona para a página principal
     } catch (error) {
       console.error("Erro ao editar o usuário:", error);
       alert("Erro ao salvar as alterações.");

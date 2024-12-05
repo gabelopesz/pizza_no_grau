@@ -31,8 +31,9 @@ const ProductCRUD = () => {
   const handleDeactivateProduct = async (id) => {
     setProcessing(true);
     try {
-      await deactivateProduct(id);
-      setProducts(products.map((product) => (product.id === id ? { ...product, isActive: false } : product)));
+      await deactivateProduct(id);  // Desativa o produto
+      // Recarrega a página após a desativação
+      window.location.reload(); // Recarga a página
     } catch (error) {
       console.error(`Erro ao desativar produto com ID ${id}:`, error);
       alert("Não foi possível desativar o produto.");
@@ -44,7 +45,7 @@ const ProductCRUD = () => {
   const handleActivateProduct = async (id) => {
     setProcessing(true);
     try {
-      await activateProduct(id);
+      await activateProduct(id);  // Ativa o produto
       setProducts(products.map((product) => (product.id === id ? { ...product, isActive: true } : product)));
     } catch (error) {
       console.error(`Erro ao ativar produto com ID ${id}:`, error);
@@ -55,7 +56,7 @@ const ProductCRUD = () => {
   };
 
   const handleEditProduct = (product) => {
-    navigate(`/edit-product/${product.id}`, { state: { product } }); 
+    navigate(`/edit-product/${product.id}`, { state: { product } });
   };
 
   return (
@@ -79,9 +80,9 @@ const ProductCRUD = () => {
       ) : (
         <ProductTable
           products={products}
-          onDeactivate={processing ? null : handleDeactivateProduct}
+          onDeactivate={processing ? null : handleDeactivateProduct}  // Ação de desativação
           onActivate={processing ? null : handleActivateProduct}
-          onEdit={handleEditProduct} 
+          onEdit={handleEditProduct}
         />
       )}
     </Box>
